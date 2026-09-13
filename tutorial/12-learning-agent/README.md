@@ -218,3 +218,6 @@ update_knowledge_state 属于高影响写操作，应校验证据并保留历史
 - 计划产生可调度 Task；
 - 评测至少包含一个延迟学习效果指标。
 
+## 延伸阅读
+
+- [选修：用 OpenAI Agents SDK 观察运行过程](../12-official-openai-agents/README.md)。此实验依赖另一个本地检出目录，不是本章验收的前置条件。

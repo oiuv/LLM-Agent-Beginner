@@ -1,7 +1,9 @@
-# 阶段 16：Expert Package——把 Agent 能力封装成可创建、可验证、可分发的专家
+# 进阶专题 16：Expert Package——设计可安装的专家定义
 
 > 前置知识：阶段 3、5～9、12～14
-> 里程碑：能设计一个版本化专家包，并安全绑定到现有 Agent Runtime
+> 里程碑：能设计一个版本化专家包，并说明安全绑定到 Agent Runtime 所需的校验
+
+本专题是架构设计与样例走读。目录中的 `expert.yaml`、策略和评测用例是**拟议的包格式**，不是 OpenAI、QClaw 或 OpenClaw 的通用规范。本项目尚未实现 Expert Package 安装器、编译器、评测执行器或发布系统，因此示例不能直接安装、运行或分发。完成下面的练习代表设计通过人工检查，不代表发布门槛已经由程序验证。
 
 ## 为什么在 Runtime 之后学习专家包
 
@@ -87,19 +89,19 @@ OpenClaw 使用 Workspace Bootstrap 文件组织 Agent 的身份、操作规程�
 
 requiredTools 表示专家需要什么能力；最终可见和可执行工具由 Tool Registry、用户连接状态和 Policy Engine 共同决定。
 
-### 配置需要编译
+### 未来的安装器需要编译配置
 
-Runtime 不应在每一轮临时解释整个专家目录。安装或更新时先完成 Schema、依赖、安全和预算校验，生成 ResolvedExpertDefinition。
+正式实现时，Runtime 不应在每一轮临时解释整个专家目录。安装或更新时应先完成 Schema、依赖、安全和预算校验，再生成 ResolvedExpertDefinition；当前示例只描述这一目标流程。
 
 ### 每个专家自带评测
 
 专家包需要声明触发、轨迹、输出和安全评测。只有“介绍文案 + Prompt”不能构成可发布专家。
 
-## 学习完成标准
+## 设计练习完成标准
 
 - 能区分 ExpertDefinition、ExpertInstallation 和 UserRuntimeState；
 - 能解释每个文件的职责和安全边界；
-- 能把 Automation Template 编译为 Scheduler Trigger；
-- 能验证 Skill、Tool 和 Connector 依赖；
+- 能画出 Automation Template 到 Scheduler Trigger 的编译步骤；
+- 能列出 Skill、Tool 和 Connector 依赖的校验条件；
 - 能说明升级中的 Thread 与 Run 如何固定版本；
 - 能为学习专家编写至少一个正常和一个安全评测。

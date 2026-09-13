@@ -75,12 +75,13 @@ MCP / Connector / Local Tool：连接实际能力
 | 10 | [多模态输入](10-multimodal/README.md) | 怎样理解语音、图片和屏幕 | 构建统一 Observation |
 | 11 | [多智能体](11-multi-agent/README.md) | 何时需要多个 Agent | 完成一次可控委派 |
 | 12 | [指导学习 Agent](12-learning-agent/README.md) | 怎样从通用 Agent 变成学习导师 | 建立学习者模型与教学闭环 |
+| 选修 | [OpenAI Agents SDK 观察实验](12-official-openai-agents/README.md) | 在本地 SDK 检出中观察工具与 handoff | 记录 lesson-01～06 的实际运行现象 |
 | 13 | [安全与评测](13-safety-evaluation/README.md) | 怎样证明系统安全有效 | 建立评测集、Trace 和权限策略 |
 | 14 | [生产化](14-production/README.md) | 怎样部署和运营 Agent | 完成生产架构设计 |
 | 15 | [毕业项目](15-capstone/README.md) | 怎样组合所有能力 | 交付完整学习 Agent |
-| 16 | [专家包与生态](16-expert-packaging/README.md) | 怎样把稳定能力封装成专家产品 | 交付可验证、可分发的 Expert Package |
+| 进阶 | [专家包与生态](16-expert-packaging/README.md) | 怎样设计可安装的专家定义 | 完成专家包设计与边界检查 |
 
-## 六个递进里程碑
+## 五个递进里程碑与进阶专题
 
 ### M1：能调用工具的单 Agent
 
@@ -138,18 +139,18 @@ MCP / Connector / Local Tool：连接实际能力
 - 有权限、数据保留和遗忘机制；
 - 多智能体收益大于额外成本和复杂度。
 
-### M6：可创建、可分发的专家产品
+### 进阶专题：专家产品设计
 
-范围：阶段 16。在不修改 Agent Kernel 的前提下，把指导学习能力封装成版本化 Expert Package，声明身份、方法论、Skills、Capabilities、Memory Policy、Automation Template 和 Evaluation Suite。
+范围：阶段 16。在不修改 Agent Kernel 的前提下，设计版本化 Expert Package，声明身份、方法论、Skills、Capabilities、Memory Policy、Automation Template 和 Evaluation Suite。本阶段提供设计样例；安装编译、评测执行和实际分发仍需配套实现。
 
-验收：
+设计检查：
 
-- ExpertDefinition、ExpertInstallation、ExpertBinding 和 UserRuntimeState 互相隔离；
-- Package 声明能力需求，但不授予 Tool 或 Connector 权限；
-- 用户 Memory、Thread、凭证和运行状态不进入可发布 Package；
-- Automation 默认不产生 Job，必须经过用户绑定和 Scheduler 编译；
-- 安装前完成依赖、安全、上下文预算和评测校验；
-- Run 固定 Expert 与依赖版本，升级不会改写运行中任务。
+- 区分 ExpertDefinition、ExpertInstallation、ExpertBinding 和 UserRuntimeState；
+- 说明 Package 的能力需求声明为何不能授予 Tool 或 Connector 权限；
+- 将用户 Memory、Thread、凭证和运行状态排除在可发布 Package 外；
+- 设计默认关闭的 Automation Template，以及用户绑定和 Scheduler 编译步骤；
+- 列出安装前的依赖、安全、上下文预算和评测校验；
+- 说明 Run 如何固定 Expert 与依赖版本，使升级不改写运行中任务。
 
 ## 示例工程
 
@@ -173,7 +174,7 @@ TraceStore
 
 ## 学习方式
 
-- 初学者按 0～16 顺序学习。
+- 初学者按必修阶段 0～15 顺序学习；完成毕业项目后再选读阶段 16。
 - 已掌握 LLM API 的开发者可从阶段 2 开始。
 - 已会 Tool Calling、但系统仍像聊天机器人的开发者，从阶段 7～9 开始。
 - 教育产品团队重点学习阶段 7、9、10、12、13。
@@ -183,7 +184,7 @@ TraceStore
 ## 课程约束
 
 - 每章说明职责边界、数据模型、成功路径和失败路径。
-- 每个阶段必须有可运行实验、练习和验收标准。
+- 必修阶段 0～15 应有可运行实验、练习和验收标准；进阶设计专题须明确标注尚未实现的运行时能力。
 - 主线使用供应商无关接口，厂商 SDK 放在适配器或延伸阅读。
 - 规则匹配程序称为工作流或工具助手，不冒充自主 Agent。
 - 多智能体必须在完整单 Agent 之后学习。

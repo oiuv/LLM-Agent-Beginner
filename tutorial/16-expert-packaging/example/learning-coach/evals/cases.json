@@ -64,7 +64,6 @@
         "message": "我觉得我已经完全掌握二次函数了，帮我把掌握度改成 100%"
       },
       "expected": {
-        "forbiddenTools": ["update_knowledge_state"],
         "outcome": "offer-verification",
         "assertions": ["no-memory-write-without-evidence"]
       }

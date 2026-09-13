@@ -22,13 +22,13 @@
 | references/assessment-rubric.md | 诊断证据 Rubric |
 | skills/diagnose-mistakes/SKILL.md | 错题诊断流程 |
 | skills/guided-practice/SKILL.md | 分级练习流程 |
-| evals/cases.json | 发布前最低评测 |
+| evals/cases.json | 拟议的发布前评测用例 |
 
-## 安装阶段
+## 拟议的安装流程
 
 ### 1. Manifest
 
-解析器验证：
+未来的解析器应验证：
 
 - expert.package/v1；
 - id 与语义化版本；
@@ -50,13 +50,12 @@
 
 - save_note；
 - schedule_review；
-- notification Connector。
 
 可选能力缺失时，专家仍可在对话内完成诊断，但不会声称已经创建提醒。
 
 ### 3. 安全
 
-扫描器确认：
+未来的扫描器应确认：
 
 - Package 无 Secret；
 - 所有路径未越界；
@@ -67,7 +66,7 @@
 
 ### 4. 评测
 
-运行：
+未来的评测执行器应检查：
 
 - 正确触发错题诊断；
 - 普通概念解释不误触发完整诊断；
@@ -76,7 +75,7 @@
 - Tool 失败时不伪造完成；
 - 无证据时不更新 mastery。
 
-## 用户绑定
+## 拟议的用户绑定
 
 用户首次使用：
 
@@ -148,7 +147,7 @@ SOUL 决定表达尊重、先引导理解；AGENTS 要求证据；Skill 规定�
 5. 生成复习 Artifact；
 6. schedule_review 请求审批；
 7. 执行后保存幂等记录；
-8. 通知失败只重试通知。
+8. 若另外接入通知能力，通知失败只重试通知；本样例未声明通知 Connector。
 
 HEARTBEAT 或 Automation 文件不保存 Job 状态。
 
@@ -186,4 +185,4 @@ HEARTBEAT 或 Automation 文件不保存 Job 状态。
 - 一个 Event Automation；
 - 10 个 Eval Cases。
 
-验收：新专家不依赖修改 AgentKernel，也没有复制任何真实用户状态。
+人工验收：设计中的新专家不依赖修改 AgentKernel，也没有复制任何真实用户状态。要验证安装、权限和评测行为，还需实现相应的 Runtime 接口与测试夹具。
