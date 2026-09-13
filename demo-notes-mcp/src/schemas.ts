@@ -2,7 +2,7 @@
  * Zod validation schemas for the Notes MCP Server
  */
 
-import { z } from "zod";
+import * as z from "zod/v4";
 import { ResponseFormat } from "./types.js";
 
 // Common pagination schema

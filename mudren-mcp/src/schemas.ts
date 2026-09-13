@@ -2,7 +2,7 @@
  * Zod validation schemas for the Forum MCP Server
  */
 
-import { z } from "zod";
+import * as z from "zod/v4";
 import { ResponseFormat, ThreadTab } from "./types.js";
 
 // Pagination schema

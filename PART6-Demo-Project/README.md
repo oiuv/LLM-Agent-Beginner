@@ -1,38 +1,17 @@
-# Demo Project: 天气 + GitHub 助手
+# 完整演示：天气 + 仓库助手（MCP 2026-07-28）
 
-完整演示项目，整合 MCP Server、MCP Client、Agent 的所有知识点。
+本例把两个 stdio Server 接入一个 CLI。天气与仓库数据均为教学用固定样本；Agent 部分用简单关键字解析模拟意图，不调用真实模型或 GitHub API。重点是同一 Host 管理两个 MCP Client、确认协议版本、列工具与调用工具。
 
-## 快速开始
+先分别在 [天气 Server](../PART2-MCP-Server/weather-server/README.md) 和 [仓库 Server](../PART2-MCP-Server/github-server/README.md) 目录执行 `npm install` 与 `npm run build`。再在本目录执行：
 
-```bash
-# 安装依赖
+~~~powershell
 npm install
-
-# 构建项目
 npm run build
-
-# 运行 CLI
 npm run start -- weather 北京
 npm run start -- github search react
-npm run start -- agent "帮我查一下北京的天气"
-```
+npm run start -- agent "帮我查一下北京的天气，然后搜索 React 仓库"
+~~~
 
-## 项目结构
+[Client 管理器](src/mcp/client.ts)为每个 Server 建立独立 Client，显式钉住 2026-07-28，并在连接后确认现代协议时代；[CLI](src/cli.ts)选择工具，[演示 Agent](src/agent/index.ts)组合结果。协议依据：[2026 架构](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/cc2a84f5ca5404b2949683f7d7876f623344294f/docs/specification/2026-07-28/architecture/index.mdx)；SDK 依据：[TS 版本策略](https://github.com/modelcontextprotocol/typescript-sdk/blob/b65426158ed9f29aea8ef3dc09ca22d7d9d6f970/docs/protocol-versions.md)。
 
-```
-demo-project/
-├── src/
-│   ├── cli.ts              # CLI 入口
-│   ├── mcp/
-│   │   └── client.ts       # MCP Client 管理器
-│   └── agent/
-│       └── index.ts        # Agent 实现
-├── package.json
-└── tsconfig.json
-```
-
-## 功能
-
-- ✅ 天气查询（当前天气、预报、空气质量）
-- ✅ GitHub 查询（搜索仓库、获取信息、查看提交）
-- ✅ Agent 模式（智能理解意图，自动调用工具）
+验收：三种命令都能返回样本数据；将一个 Server 改成仅接受旧协议后，Client 应失败而非静默回退。深入学习见 [章节说明](01-project-overview.md)。

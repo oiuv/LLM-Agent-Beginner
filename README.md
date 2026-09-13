@@ -1,5 +1,9 @@
 # 从零开发完整 Agent
 
+## MCP 2026-07-28 主线
+
+MCP 教程的现有 [PART1 协议](PART1-MCP-Protocol/01-protocol-overview.md)、[PART2 Server](PART2-MCP-Server/01-server-architecture.md)、[PART3 Client](PART3-MCP-Client/01-client-architecture.md) 已以已发布的 2026-07-28 版为主线；[2025 握手版与迁移](PART1-MCP-Protocol/10-mcp-2026-07-28-upgrade-guide.md)作为附录。
+
 > 从模型调用开始，循序渐进构建具备理解、规划、记忆、执行、调度、多模态和治理能力的指导学习 Agent。
 
 ## 新版推荐入口
@@ -22,13 +26,13 @@ npm run tutorial
 npm run test:runtime
 ~~~
 
-## 旧版专题资料
+## 专题资料
 
-以下 PART1～PART7 内容继续保留，适合作为 MCP、Skills、Agent 模式和部署的深入阅读；零基础学习请优先使用新版课程。
+以下 PART1～PART3 是 MCP 2026-07-28 的深入教程；PART4～PART7 提供 Skills、Agent 模式和部署专题。零基础学习建议先按阶段 0～15 前进。
 
 ---
 
-## 完整学习路径
+## 专题目录
 
 ```
 PART1: MCP 协议层（理论基础）
@@ -36,7 +40,7 @@ PART1: MCP 协议层（理论基础）
 ├── 01-protocol-overview.md     协议设计哲学、三层架构、四种能力
 ├── 02-json-rpc-spec.md        JSON-RPC 2.0 完整规范
 ├── 03-message-types.md        MCP 消息类型详解
-├── 04-capabilities.md          Capability 协商机制
+├── 04-capabilities.md          每请求能力声明
 ├── 05-transport-layer.md       stdio 和 Streamable HTTP 传输层
 ├── 06-error-handling.md       错误码体系与调试
 ├── 07-mcp-vs-rag.md           MCP 与 RAG 的选择指南
@@ -47,7 +51,7 @@ PART2: MCP Server 开发
 ├── 02-tool-definition.md      工具定义与 inputSchema
 ├── 03-resource-management.md  资源管理与订阅机制
 ├── 04-prompt-management.md    提示词模板
-└── 05-session-lifecycle.md    会话状态管理
+└── 05-session-lifecycle.md    无协议会话的请求生命周期
 
 PART3: MCP Client 开发
 ├── 01-client-architecture.md  Client 架构
@@ -101,7 +105,7 @@ PART7: 生产环境
 ### 协议层面
 - 理解 MCP 协议的设计原理和通信机制
 - 掌握 JSON-RPC 2.0 规范
-- 理解 Capability 协商机制
+- 理解 每请求能力声明
 
 ### 开发层面
 - 开发自己的 MCP Server（工具、资源、提示词）
@@ -131,7 +135,7 @@ PART7: 生产环境
 
 ---
 
-## 推荐学习顺序
+## 专题学习顺序
 
 ```
 第一阶段：建立认知地图（必读）

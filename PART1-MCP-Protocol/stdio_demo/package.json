@@ -1,16 +1,16 @@
 {
   "name": "mcp-stdio-demo",
-  "version": "1.0.0",
-  "description": "MCP STDIO 传输模式演示（2026-07-28 版本）",
+  "private": true,
   "type": "module",
   "scripts": {
     "server": "node server.js",
     "client": "node client.js",
     "test": "node client.js"
   },
+  "engines": { "node": ">=20" },
   "dependencies": {
-    "@modelcontextprotocol/server": "^1.0.0",
-    "@modelcontextprotocol/client": "^1.0.0",
-    "zod": "^3.22.0"
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "zod": "^4.0.0"
   }
 }

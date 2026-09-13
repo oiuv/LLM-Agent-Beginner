@@ -35,7 +35,7 @@ export class MCPClientManager {
   async connectWeatherServer(): Promise<void> {
     this.weatherClient = new Client(
       { name: "demo-client", version: "1.0.0" },
-      { capabilities: {} }
+      { versionNegotiation: { mode: { pin: "2026-07-28" } } }
     );
 
     const serverPath = path.resolve(
@@ -49,6 +49,7 @@ export class MCPClientManager {
     });
 
     await this.weatherClient.connect(this.weatherTransport);
+    if (this.weatherClient.getProtocolEra() !== "modern") throw new Error("天气 Server 未使用 MCP 2026");
     console.log("✅ 已连接到天气 Server");
   }
 
@@ -58,7 +59,7 @@ export class MCPClientManager {
   async connectGitHubServer(): Promise<void> {
     this.githubClient = new Client(
       { name: "demo-client", version: "1.0.0" },
-      { capabilities: {} }
+      { versionNegotiation: { mode: { pin: "2026-07-28" } } }
     );
 
     const serverPath = path.resolve(
@@ -72,6 +73,7 @@ export class MCPClientManager {
     });
 
     await this.githubClient.connect(this.githubTransport);
+    if (this.githubClient.getProtocolEra() !== "modern") throw new Error("GitHub Server 未使用 MCP 2026");
     console.log("✅ 已连接到 GitHub Server");
   }
 
@@ -89,10 +91,12 @@ export class MCPClientManager {
     });
 
     const content = result.content as ToolContent[];
-    return content
+    const message = content
       .filter((c) => c.type === "text")
       .map((c) => c.text || "")
       .join("\n");
+    if (result.isError) throw new Error(message);
+    return message;
   }
 
   /**
@@ -109,10 +113,12 @@ export class MCPClientManager {
     });
 
     const content = result.content as ToolContent[];
-    return content
+    const message = content
       .filter((c) => c.type === "text")
       .map((c) => c.text || "")
       .join("\n");
+    if (result.isError) throw new Error(message);
+    return message;
   }
 
   /**

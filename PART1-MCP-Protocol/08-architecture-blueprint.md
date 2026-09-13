@@ -654,7 +654,7 @@ async function getWeatherFromAPI(city: string) {
 ## 下一步
 
 继续阅读：
-- [05-function-calling-mechanism.md](../PART5-Agent/05-function-calling-mechanism.md) — Function Calling 机制详解
+- [05-function-calling-mechanism.md](../PART5-Agent/01-function-calling-mechanism.md) — Function Calling 机制详解
 - [09-tool-vs-skill-discovery.md](../PART4-Skills-System/09-tool-vs-skill-discovery.md) — Tool 与 Skill 发现机制对比
 
 ---

@@ -11,7 +11,7 @@
  */
 
 import { McpServer } from "@modelcontextprotocol/server";
-import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { registerTools } from "./tools.js";
 
 // Create MCP server instance
@@ -23,17 +23,6 @@ const server = new McpServer({
 // Register all tools
 registerTools(server);
 
-// Main function using stdio transport
-async function main() {
-  console.error("Mudren MCP Server starting via stdio...");
-
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-
-  console.error("Mudren MCP Server running via stdio (ready for npx/local use)");
-}
-
-main().catch((error) => {
-  console.error("Server error:", error);
-  process.exit(1);
-});
+// 2026 stdio 入口；调试输出只写 stderr。
+console.error("MCP 2026-07-28 stdio Server 已启动");
+void serveStdio(() => server, { legacy: "reject" });

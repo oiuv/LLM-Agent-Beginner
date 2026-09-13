@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 天气 MCP Server（2026-07-28 版本）
+ * 天气 MCP Server
  *
  * 基于新版 MCP SDK（@modelcontextprotocol/server）实现
  * 使用 McpServer + registerTool + Zod schema
@@ -13,8 +13,8 @@
  */
 
 import { McpServer } from "@modelcontextprotocol/server";
-import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
-import { z } from "zod";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
+import * as z from "zod/v4";
 
 // 模拟天气数据库
 const weatherDB: Record<string, WeatherData> = {
@@ -89,7 +89,7 @@ server.registerTool(
     const data = weatherDB[city];
 
     if (!data) {
-      throw new Error(`未找到城市 "${city}" 的天气数据。支持的城市：${Object.keys(weatherDB).join("、")}`);
+      return { content: [{ type: "text" as const, text: `未找到城市 "${city}" 的天气数据。支持的城市：${Object.keys(weatherDB).join("、")}` }], isError: true };
     }
 
     const result = `
@@ -125,7 +125,7 @@ server.registerTool(
     const data = weatherDB[city];
 
     if (!data) {
-      throw new Error(`未找到城市 "${city}" 的数据`);
+      return { content: [{ type: "text" as const, text: `未找到城市 "${city}" 的数据` }], isError: true };
     }
 
     // 模拟未来几天的天气
@@ -171,7 +171,7 @@ server.registerTool(
     const data = weatherDB[city];
 
     if (!data) {
-      throw new Error(`未找到城市 "${city}" 的数据`);
+      return { content: [{ type: "text" as const, text: `未找到城市 "${city}" 的数据` }], isError: true };
     }
 
     const result = `
@@ -227,17 +227,6 @@ function getAQIAdvice(aqi: number): string {
   return "中度污染，建议减少户外活动";
 }
 
-// 启动服务器
-async function main() {
-  const transport = new StdioServerTransport();
-
-  console.error("🌤️ 天气 MCP Server 已启动（2026-07-28 版本）");
-  console.error("等待客户端连接...\n");
-
-  await server.connect(transport);
-}
-
-main().catch((error) => {
-  console.error("服务器启动失败:", error);
-  process.exit(1);
-});
+// 启动 2026 stdio 入口；stdout 保留给 JSON-RPC。
+console.error("MCP 2026-07-28 stdio Server 已启动");
+void serveStdio(() => server, { legacy: "reject" });

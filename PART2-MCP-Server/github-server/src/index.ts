@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * GitHub MCP Server（2026-07-28 版本）
+ * GitHub MCP Server
  *
  * 基于新版 MCP SDK（@modelcontextprotocol/server）实现
  * 使用 McpServer + registerTool + Zod schema
@@ -13,8 +13,8 @@
  */
 
 import { McpServer } from "@modelcontextprotocol/server";
-import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
-import { z } from "zod";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
+import * as z from "zod/v4";
 
 // 模拟 GitHub 数据
 const mockRepos: Record<string, RepoData> = {
@@ -145,7 +145,7 @@ server.registerTool(
     const data = mockRepos[key];
 
     if (!data) {
-      throw new Error(`未找到仓库: ${key}`);
+      return { content: [{ type: "text" as const, text: `未找到仓库: ${key}` }], isError: true };
     }
 
     const result = `
@@ -180,7 +180,7 @@ server.registerTool(
     const data = mockRepos[key];
 
     if (!data) {
-      throw new Error(`未找到仓库: ${key}`);
+      return { content: [{ type: "text" as const, text: `未找到仓库: ${key}` }], isError: true };
     }
 
     const commits = data.commits.slice(0, limit);
@@ -199,17 +199,6 @@ ${commits.map(c => `
   }
 );
 
-// 启动服务器
-async function main() {
-  const transport = new StdioServerTransport();
-
-  console.error("🐙 GitHub MCP Server 已启动（2026-07-28 版本）");
-  console.error("等待客户端连接...\n");
-
-  await server.connect(transport);
-}
-
-main().catch((error) => {
-  console.error("服务器启动失败:", error);
-  process.exit(1);
-});
+// 启动 2026 stdio 入口；stdout 保留给 JSON-RPC。
+console.error("MCP 2026-07-28 stdio Server 已启动");
+void serveStdio(() => server, { legacy: "reject" });

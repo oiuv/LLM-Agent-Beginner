@@ -1,5 +1,7 @@
 # 阶段 5：Tools、MCP 与 Connectors
 
+> MCP 主线采用已发布的 2026-07-28 规范。依次阅读 [协议](../../PART1-MCP-Protocol/01-protocol-overview.md) → [Server](../../PART2-MCP-Server/01-server-architecture.md) → [Client](../../PART3-MCP-Client/01-client-architecture.md)。[2025 握手版与迁移](../../PART1-MCP-Protocol/10-mcp-2026-07-28-upgrade-guide.md)仅作附录。规范以 [官方 2026-07-28 文档](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/cc2a84f5ca5404b2949683f7d7876f623344294f/docs/specification/2026-07-28)和 [schema.ts](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/cc2a84f5ca5404b2949683f7d7876f623344294f/schema/2026-07-28/schema.ts) 为准。
+
 > 前置知识：阶段 2～4  
 > 里程碑：Agent 能通过统一注册表使用本地 Tool、MCP Tool 和外部 Connector
 
@@ -29,7 +31,7 @@ Connector 可以暴露为 MCP Server，也可以直接注册为本地 Tool。MCP
 ~~~
 Agent Host
   └─ MCP Client
-       ├─ 连接与能力协商
+       ├─ 版本发现与能力读取
        ├─ tools/list 与 tools/call
        ├─ resources/list 与 resources/read
        └─ prompts/list 与 prompts/get
@@ -56,7 +58,7 @@ interface CapabilitySource {
 
 1. 根据配置创建 Client；
 2. 建立传输连接；
-3. 协商协议和能力；
+3. 确认协议版本与能力（2026 版无需 initialize 握手）；
 4. 获取 Tools、Resources、Prompts；
 5. 过滤当前用户可见能力；
 6. 注册或更新 Tool Registry；
