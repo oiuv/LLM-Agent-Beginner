@@ -10,7 +10,7 @@
 
 正文都应声明完成条件、失败路径与依赖工具。只有需要写入学习状态时才提出写动作，由运行时处理权限。
 
-可阅读 [专家包中的设计样例](../16-expert-packaging/example/learning-coach/README.md)，观察 Skill 如何引用教学政策与评测规则。专家包是本项目的设计提案，不是通用 Skill 标准，也没有配套安装运行器。
+可阅读 [学习导师插件](../../examples/learning-coach-plugin/README.md)，观察标准 SKILL.md 如何携带教学参考资料。Plugin 负责封装与组件发现，Skill 保持 Agent Skills 格式；文件加载到本教程 Runtime 仍需宿主适配器。
 
 ## 动手要求
 

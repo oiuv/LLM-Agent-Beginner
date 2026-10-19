@@ -100,9 +100,25 @@ interface EvalCase {
 
 [架构实验](../../examples/learning-agent-runtime/src/patterns.test.ts) 验证确定性控制流，不能作为真实模型效果证据。任务交付验收、模型质量与学生长期学习效果分别报告。
 
+## Hooks 回归
+
+[Hooks 测试](../../examples/learning-agent-runtime/src/hooks.test.ts) 对运行路径做断言，不只检查最终回答：
+
+| 场景 | 必须验证的结果 |
+|---|---|
+| 参数无效、权限拒绝或缺少审批 | 后置的 continue Hook 不能放行，工具执行次数为零 |
+| 工具前 Hook 明确拒绝 | 返回 HOOK_BLOCKED，没有工具副作用 |
+| 控制型 Hook 抛错、返回无效结果或超时 | Run 失败，迟到结果不会重新执行工具 |
+| 观察型 Hook 失败 | Trace 保留故障，原 Outcome 不变 |
+| 完成验收反复拒绝 | 反馈进入下一轮，但总步数仍有上限 |
+| 取消发生在 Hook 内 | cancelled，RunEnd 收尾一次，不再调用模型 |
+| Hook 修改输入副本 | 实际工具参数、结果和后续 Hook 的输入不变 |
+
+进程内测试证明本项目契约；真实 Claude Code / Codex 配置还要验证事件覆盖、版本、匹配规则和故障策略，不能从同名事件推断兼容性。
+
 ## 回归与发布门槛
 
-每次修改 Prompt、Skill、Tool Schema、模型、Memory 或 Planner 都可能改变行为。发布前：
+每次修改 Prompt、Skill、Hook、Tool Schema、模型、Memory 或 Planner 都可能改变行为。发布前：
 
 1. 跑确定性测试；
 2. 跑固定轨迹评测；

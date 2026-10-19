@@ -104,7 +104,7 @@ export interface TraceEvent {
   id: string;
   traceId: string;
   parentId?: string;
-  type: "run" | "model" | "tool" | "policy" | "memory" | "task" | "artifact";
+  type: "run" | "model" | "tool" | "policy" | "memory" | "task" | "artifact" | "hook";
   name: string;
   status: "started" | "ok" | "error" | "cancelled";
   at: string;

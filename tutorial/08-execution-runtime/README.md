@@ -1,22 +1,28 @@
 # 阶段 8：执行运行时
 
 > 前置知识：阶段 2、3、5、7  
-> 里程碑：工具动作具备权限、审批、超时、取消、幂等和交付物管理
+> 里程碑：理解生命周期 Hooks，并逐步补齐权限、审批、超时、取消、幂等和交付物管理
 
 ## 模型提出动作，Runtime 承担后果
 
-执行运行时位于 Agent Kernel 与真实系统之间。它不能被某个 Tool、MCP Server 或 Skill 绕过。
+执行运行时位于 Agent Kernel 与真实系统之间。应用应让本地工具、MCP 和 Skill 发起的动作统一经过执行器；本例的进程内接口不是防止任意代码绕过的沙箱。
 
 ~~~
 ProposedToolCall
+  ↓ Quota / Budget
   ↓ Schema Validator
   ↓ Policy Engine
   ↓ Approval Gate
-  ↓ Quota / Budget
+  ↓ BeforeToolCall Hook
   ↓ Executor / Sandbox
   ↓ Result Normalizer
+  ↓ AfterToolCall Hook
   ↓ Artifact Store + Trace
 ~~~
+
+## Hooks 管理生命周期
+
+先学习 [Hooks 专题](hooks.md)：为什么需要独立扩展点、五个教学事件、观察与控制的区别，以及 Claude Code / Codex 的参考边界。运行 `npm run tutorial:hooks` 观察拦截、失败与验收，再继续本章的审批、恢复和副作用管理。
 
 ## Tool Call 记录
 
@@ -62,7 +68,7 @@ type PolicyDecision =
 
 ## 当前实现与工程目标
 
-[ToolExecutor](../../examples/learning-agent-runtime/src/tools.ts) 已实现参数校验、基础策略、审批等待与错误归一化；[Kernel](../../examples/learning-agent-runtime/src/agent.ts) 检查最大步数和工具调用次数。持久审批、自动重试、超时、沙箱和跨进程恢复是本章待实现能力。
+[ToolExecutor](../../examples/learning-agent-runtime/src/tools.ts) 已实现参数校验、基础策略、审批等待、工具前后 Hooks 与错误归一化；[Kernel](../../examples/learning-agent-runtime/src/agent.ts) 实现运行生命周期、完成验收、最大步数和工具调用预算。Hook 回调已有超时与取消处理；工具执行本身的截止时间、持久审批、自动重试、沙箱和跨进程恢复仍是工程练习。
 
 ## Human-in-the-loop
 
@@ -153,6 +159,7 @@ Artifact 需要版本、来源、校验和、权限和生命周期。Tool Result
 - VALIDATION_ERROR；
 - PERMISSION_DENIED；
 - APPROVAL_REQUIRED；
+- HOOK_BLOCKED；
 - TIMEOUT；
 - CANCELLED；
 - RATE_LIMITED；
@@ -177,7 +184,7 @@ Artifact 需要版本、来源、校验和、权限和生命周期。Tool Result
 
 验收标准：
 
-- Tool 无法绕过 Policy Engine；
+- 应用动作统一经过 Policy Engine，Hook 不能扩大权限；
 - 审批可跨进程恢复且会过期；
 - 取消信号到达执行器；
 - 写操作重复提交不产生两次副作用；
@@ -185,5 +192,6 @@ Artifact 需要版本、来源、校验和、权限和生命周期。Tool Result
 
 ## 延伸阅读
 
+- [Hooks 官方资料与实现差异](hooks.md#参考-claude-code-与-codex)
 - [安全与评测](../13-safety-evaluation/README.md)
 - [Tool 错误与确认](../05-tools-mcp-connectors/mcp/server/02-tool-definition.md)

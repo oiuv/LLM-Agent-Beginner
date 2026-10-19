@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "learning-coach",
+  "version": "1.0.0",
+  "description": "基于作答证据的错题诊断与分级练习",
+  "keywords": [
+    "learning",
+    "diagnosis",
+    "practice"
+  ]
+}

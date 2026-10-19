@@ -31,7 +31,7 @@ const outcome = await runStudyWorkflow({
 console.log("verified workflow:", outcome.status, "model calls:", model.requests.length);
 if ("traceId" in outcome) {
   console.log("acceptance checks:", traces.list(outcome.traceId)
-    .filter((event) => event.name === "goal.verify").map((event) => event.status));
+    .filter((event) => event.name === "goal.verify" && event.status !== "started").map((event) => event.status));
 }
 console.log("missing evidence:", (await runStudyWorkflow({
   evidence: [], minutes: 30, lookup: async () => resources[0]!,

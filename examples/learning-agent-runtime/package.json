@@ -7,8 +7,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "demo": "npm run build && node dist/index.js",
-    "test": "npm run build && node --test dist/runtime.test.js dist/patterns.test.js",
-    "patterns": "npm run build && node dist/patterns.js"
+    "test": "npm run build && node --test dist/runtime.test.js dist/patterns.test.js dist/hooks.test.js",
+    "patterns": "npm run build && node dist/patterns.js",
+    "hooks": "npm run build && node dist/hooks-demo.js"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

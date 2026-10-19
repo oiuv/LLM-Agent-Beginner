@@ -4,7 +4,8 @@
 
 | 示例 | 对应阶段 | 验证内容 |
 |---|---|---|
-| [learning-agent-runtime](learning-agent-runtime/README.md) | 2～4、6～9、12～13 | 无 API Key 的确定性运行时与架构实验 |
+| [learning-agent-runtime](learning-agent-runtime/README.md) | 2～4、6～9、12～13 | 无 API Key 的确定性运行时、架构与 Hooks 实验 |
+| [learning-coach-plugin](learning-coach-plugin/README.md) | 16 | 标准插件目录、Skill 与 MCP 配置的静态检查 |
 | [mcp-stdio](mcp-stdio/README.md) | 5 | stdio 上的发现与工具调用 |
 | [mcp-http](mcp-http/README.md) | 5 | Python Streamable HTTP |
 | [mcp-client](mcp-client/README.md) | 5 | TypeScript Client 与进程内 HTTP 服务 |

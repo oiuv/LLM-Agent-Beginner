@@ -10,10 +10,11 @@
 npm install
 npm run tutorial
 npm run tutorial:patterns
+npm run tutorial:hooks
 npm test
 ~~~
 
-在本目录也可运行 npm run demo、npm run patterns 和 npm test。所有默认实验无需 API Key。
+在本目录也可运行 npm run demo、npm run patterns、npm run hooks 和 npm test。所有默认实验无需 API Key。
 
 ## 代码地图
 
@@ -22,6 +23,7 @@ npm test
 | [types.ts](src/types.ts) | 模型、工具、输入、结果与事件类型 |
 | [model.ts](src/model.ts) | ScriptedModel 测试替身 |
 | [agent.ts](src/agent.ts) | 决策循环、答案验收、步数与调用预算 |
+| [hooks.ts](src/hooks.ts) | 五个生命周期事件、观察/控制分离、截止时间与隔离快照 |
 | [tools.ts](src/tools.ts) | 工具注册、参数校验、策略和执行 |
 | [stores.ts](src/stores.ts) | 内存 Thread、Memory、Artifact |
 | [skills.ts](src/skills.ts) | 元数据索引、依赖检查与惰性加载 |
@@ -29,7 +31,8 @@ npm test
 | [learning.ts](src/learning.ts) | 基于证据的简化学习状态 |
 | [study-workflow.ts](src/study-workflow.ts) | 路由、独立读取与学习计划验收 |
 | [patterns.ts](src/patterns.ts) | 架构模式实验入口 |
-| [runtime.test.ts](src/runtime.test.ts)、[patterns.test.ts](src/patterns.test.ts) | 正常、失败、取消与预算回归 |
+| [hooks-demo.ts](src/hooks-demo.ts) | 工具拦截、日志故障与完成验收实验 |
+| [runtime.test.ts](src/runtime.test.ts)、[patterns.test.ts](src/patterns.test.ts)、[hooks.test.ts](src/hooks.test.ts) | 正常、失败、取消与预算回归 |
 
 ## 能力边界
 
@@ -40,16 +43,21 @@ npm test
 | 写入及外部动作返回 waiting/approval | 持久审批记录、参数绑定与恢复执行 |
 | 一次性与事件 Job、进程内去重和租约 | cron、持久队列、Checkpoint、取消 Job |
 | Skill 查找与加载 | SKILL.md 文件解析、SkillRunner |
-| 可插拔答案验收与调用次数预算 | token/金额/总时限预算与真实用量结算 |
+| Hook 顺序执行、超时/取消、故障策略与 Trace | 厂商配置适配、外部脚本沙箱、上下文/压缩/子 Agent 事件 |
+| BeforeFinish 答案验收与调用次数预算 | token/金额/总时限预算与真实用量结算 |
 | 基于证据的数值更新 | 证据去重、教学策略与长期学习效果验证 |
 
 maxSteps 默认 8，maxToolCalls 默认 16；工具预算统计提案尝试，包含被拒绝的调用。预算在每次工具执行前检查，因此一批调用也受限制。
 
-未配置 verifyAnswer 时，completed 表示模型给出最终答案且本轮正常结束；配置后还须通过相应验收。学习计划验收仅检查覆盖、分钟数与资源归属，不能证明教学质量。
+未配置 BeforeFinish 验收 Hook 时，completed 表示模型给出最终答案且本轮正常结束；配置后还须通过相应验收。学习计划验收仅检查覆盖、分钟数与资源归属，不能证明教学质量。
 
 优先级只影响已就绪 Job 的领取，数值越大越先领取，同优先级按 availableAt；不抢占有效租约，也没有防饥饿机制。租约测试模拟同一进程中的 Worker 接管，不证明重启后恢复。
 
 审批示例只用 callId 表示本次允许的调用，不是生产审批凭证。工具取消是协作式的，已经提交的副作用不会自动回滚。
+
+Hooks 用法与 Claude Code / Codex 参考见 [阶段 8](../../tutorial/08-execution-runtime/hooks.md)。Kernel 通过 options.hooks 接收 RuntimeHooks，并传给 ToolExecutor；本例不会加载用户的 .claude 或 .codex 配置。
+
+观察型回调失败只记录 Trace；控制型异常、无效返回或超时使 Run 失败。所有回调默认 1000 ms 截止时间，进程内取消为协作式，不能中断同步死循环。RunEnd 观察所有返回路径，包括 waiting；进程崩溃仍需要持久恢复机制。
 
 ## 怎样使用实验
 

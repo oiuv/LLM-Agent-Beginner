@@ -41,10 +41,22 @@ Repeat：继续、重规划或结束
 2. 上下文层：Thread、记忆、Skill、工具描述和当前任务状态。
 3. Agent Kernel：目标、策略、规划、循环和停止条件。
 4. 能力层：Tool Registry、MCP Client、Connector、Skill Runner。
-5. 执行层：校验、权限、审批、沙箱、重试和取消。
+5. 执行层：校验、权限、审批、沙箱、重试、取消和生命周期 Hooks。
 6. 状态层：Memory、Thread、Task、Checkpoint、Artifact。
 7. 控制面：Scheduler、Event Bus、Queue、Worker、多 Agent 调度。
 8. 治理面：安全、评测、追踪、成本、审计和数据生命周期。
+
+## 扩展机制各管什么
+
+| 机制 | 负责的问题 | 学习 Agent 示例 |
+|---|---|---|
+| Skills：上下文与工作流程 | 一类任务按什么方法完成 | 加载“诊断薄弱点 → 选资源 → 安排复习”的步骤与约束 |
+| Tools：工具扩展 | 能执行什么具体动作 | 读取错题、保存笔记、生成测验 |
+| MCP：能力连接标准 | 怎样统一发现和访问外部能力 | 连接资源库；除 Tools 也包括 Resources、Prompts |
+| Hooks：运行时管理扩展点 | 在哪些生命周期节点观察、检查或干预 | 工具前检查范围、完成前验收、结束时记录状态 |
+| Plugins：能力封装与分发 | 怎样组合已有能力并交给宿主加载 | 学习导师插件封装诊断 Skill、练习 Skill 和 MCP 配置 |
+
+它们可组合使用：Skill 指导模型选择动作，Tool 通过本地接口或 MCP 提供能力，Runtime 在事件节点执行 Hooks，并落实权限、预算与停止条件。Hooks 不替代整个 Runtime，也不依赖模型主动调用。Hooks 实现放在 [阶段 8](../08-execution-runtime/hooks.md)，标准插件与市场边界放在 [阶段 16](../16-agent-plugins/README.md)。
 
 ## 核心对象模型
 
@@ -99,7 +111,7 @@ Repeat：继续、重规划或结束
 
 验收标准：
 
-- 能说明 Tool、MCP、Skill、Memory 和 Scheduler 的不同职责；
+- 能说明 Tool、MCP、Skill、Hook、Plugin、Memory 和 Scheduler 的不同职责；
 - 能为一次用户请求标出 Thread、Run、Turn；
 - 能列出至少三个非模型组件；
 - 能判断三个具体需求是否需要 Agent。

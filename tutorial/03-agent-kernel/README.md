@@ -37,6 +37,12 @@ running ──→ waiting_user ──→ running
 
 这张图是完整状态机设计；当前示例返回 waiting，但没有持久恢复入口。每次状态迁移必须记录事件。waiting 不是失败，cancelled 也不应被错误地自动重试。
 
+## 生命周期扩展点
+
+Kernel 在运行开始、工具前后、候选答案完成前和运行结束时提供 Hooks，供日志、范围检查和验收复用。控制型 Hook 可以拒绝动作或退回答案；观察型 Hook 只记录事实。
+
+本例把答案检查统一接入 BeforeFinish；RunEnd 则在 completed、waiting、failed、cancelled 各路径观察最终结果。权限与停止规则仍由 Kernel 和执行器负责，完整契约与代码见 [Hooks 运行时管理](../08-execution-runtime/hooks.md)。
+
 ## Context Builder
 
 每轮调用模型前，从以下来源组装上下文：
@@ -108,7 +114,7 @@ Observe：把结构化结果加入状态
 - 策略判断；
 - Tool 参数、耗时和结果摘要；
 - 状态迁移；
-- 最终 Outcome；
+- Hook 执行状态与最终 Outcome；
 - token、成本和错误。
 
 Trace 是调试、评测和审计共同的事实来源。

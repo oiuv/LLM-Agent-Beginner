@@ -1,4 +1,5 @@
-import { AgentKernel, type AnswerVerification } from "./agent.js";
+import { AgentKernel } from "./agent.js";
+import { RuntimeHooks } from "./hooks.js";
 import { InMemoryTraceStore } from "./trace.js";
 import { BasicPolicyEngine, ToolExecutor, ToolRegistry } from "./tools.js";
 import type { ModelProvider, RunOutcome } from "./types.js";
@@ -18,7 +19,7 @@ export function verifyStudyPlan(
   answer: string,
   goal: StudyGoal,
   resources: Resource[],
-): AnswerVerification {
+): { passed: boolean; feedback: string } {
   let plan: unknown;
   try {
     plan = JSON.parse(answer);
@@ -100,6 +101,14 @@ export async function runStudyWorkflow(input: {
 
   const goal: StudyGoal = { topics, minutes: input.minutes };
   const registry = new ToolRegistry();
+  const hooks = new RuntimeHooks(input.traces);
+  hooks.addGuard("BeforeFinish", {
+    id: "goal.verify",
+    handle: ({ answer }) => {
+      const result = verifyStudyPlan(answer, goal, resources);
+      return result.passed ? { effect: "continue" } : { effect: "block", reason: result.feedback };
+    },
+  });
   const kernel = new AgentKernel(
     input.model, registry,
     new ToolExecutor(registry, new BasicPolicyEngine(), input.traces),
@@ -109,7 +118,7 @@ export async function runStudyWorkflow(input: {
       maxToolCalls: 0,
       systemInstruction: "Return JSON: {sessions:[{topic,minutes,resourceId}]}. " +
         "Cover every target topic within the total minute limit. Use only supplied resources.",
-      verifyAnswer: (answer) => verifyStudyPlan(answer, goal, resources),
+      hooks,
     },
   );
   return kernel.run({

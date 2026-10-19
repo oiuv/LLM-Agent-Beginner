@@ -7,6 +7,7 @@ import type {
   ToolResult,
 } from "./types.js";
 import { InMemoryTraceStore } from "./trace.js";
+import type { RuntimeHooks } from "./hooks.js";
 
 export class ToolRegistry {
   private readonly tools = new Map<string, Tool>();
@@ -72,6 +73,7 @@ export class ToolExecutor {
     context: ToolContext,
     allowedTools: Set<string>,
     approvedCallIds: Set<string>,
+    hooks?: RuntimeHooks,
   ): Promise<ToolResult> {
     const tool = this.registry.get(call.name);
     if (!tool || !allowedTools.has(call.name)) {
@@ -111,6 +113,13 @@ export class ToolExecutor {
       return failure("CANCELLED", "Tool call cancelled", false);
     }
 
+    const identity = { traceId: context.traceId, threadId: context.threadId, userId: context.userId };
+    const checkedCall = { ...call, arguments: args };
+    // Hooks can narrow access only, after schema, policy and approval checks.
+    const check = await hooks?.check("BeforeToolCall", { ...identity, call: checkedCall }, context.signal);
+    if (context.signal.aborted) return failure("CANCELLED", "Tool call cancelled", false);
+    if (check?.effect === "block") return failure("HOOK_BLOCKED", check.reason, false);
+
     this.traces.append({
       traceId: context.traceId,
       type: "tool",
@@ -119,8 +128,9 @@ export class ToolExecutor {
       attributes: { callId: call.id, version: tool.version },
     });
 
+    let result: ToolResult;
     try {
-      const result = await tool.execute(args, context);
+      result = await tool.execute(args, context);
       this.traces.append({
         traceId: context.traceId,
         type: "tool",
@@ -128,7 +138,6 @@ export class ToolExecutor {
         status: result.ok ? "ok" : "error",
         attributes: { callId: call.id },
       });
-      return result;
     } catch (error) {
       this.traces.append({
         traceId: context.traceId,
@@ -137,12 +146,15 @@ export class ToolExecutor {
         status: "error",
         attributes: { callId: call.id },
       });
-      return failure(
+      result = failure(
         "TOOL_EXECUTION_FAILED",
         error instanceof Error ? error.message : "Tool execution failed",
         true,
       );
     }
+    // An after-hook cannot roll back an action that already happened.
+    await hooks?.observe("AfterToolCall", { ...identity, call: checkedCall, result });
+    return result;
   }
 }
 

@@ -18,6 +18,8 @@ Tool 告诉 Agent“能做什么”，Skill 告诉 Agent“某类任务怎样做
 - 示例；
 - 测试与版本。
 
+Skill 的步骤与约束进入模型上下文，执行质量需要评测。必须在工具调用前发生的检查、完成前验收和结束收尾，应放入 Runtime 的策略或 [Hooks](../08-execution-runtime/hooks.md)，不能只依赖模型记住 Skill 中的要求。
+
 ## Skill 数据模型
 
 [文件规范](specification.md) 定义 SKILL.md；[SkillManifest 与 LoadedSkill](../../examples/learning-agent-runtime/src/skills.ts) 是本项目内部接口，二者需要适配。version、triggers、requiredTools、risk 不是通用标准的必填顶层字段。

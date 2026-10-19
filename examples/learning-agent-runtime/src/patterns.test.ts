@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { AgentKernel, type AgentKernelOptions } from "./agent.js";
+import { RuntimeHooks } from "./hooks.js";
 import { ScriptedModel } from "./model.js";
 import { InMemoryScheduler } from "./scheduler.js";
 import { collectResources, runStudyWorkflow, verifyStudyPlan } from "./study-workflow.js";
@@ -19,10 +20,12 @@ const request = () => ({
     content: "plan", occurredAt: new Date().toISOString() },
 });
 
-function fixture(decisions: ModelDecision[], options: Partial<AgentKernelOptions> = {}) {
+function fixture(decisions: ModelDecision[], options: Partial<AgentKernelOptions> = {}, configure?: (hooks: RuntimeHooks) => void) {
   const registry = new ToolRegistry();
   const traces = new InMemoryTraceStore();
   const model = new ScriptedModel(decisions);
+  const hooks = new RuntimeHooks(traces);
+  configure?.(hooks);
   let executions = 0;
   registry.register({
     name: "count", version: "1", description: "Count an execution",
@@ -32,30 +35,42 @@ function fixture(decisions: ModelDecision[], options: Partial<AgentKernelOptions
   });
   const kernel = new AgentKernel(model, registry,
     new ToolExecutor(registry, new BasicPolicyEngine(), traces), traces,
-    { maxSteps: 3, systemInstruction: "test", ...options });
+    { maxSteps: 3, systemInstruction: "test", hooks, ...options });
   return { kernel, model, registry, traces, executions: () => executions };
+}
+
+function acceptPlan(hooks: RuntimeHooks): void {
+  hooks.addGuard("BeforeFinish", {
+    id: "goal.verify",
+    handle: ({ answer }) => {
+      const result = verifyStudyPlan(answer, goal, resources);
+      return result.passed ? { effect: "continue" } : { effect: "block", reason: result.feedback };
+    },
+  });
 }
 
 test("acceptance failure reaches the model and a corrected answer completes", async () => {
   const f = fixture([{ type: "answer", content: plan(60) }, { type: "answer", content: plan(20) }],
-    { verifyAnswer: (answer) => verifyStudyPlan(answer, goal, resources) });
+    {}, acceptPlan);
   const outcome = await f.kernel.run(request());
   assert.equal(outcome.status, "completed");
   assert.ok(f.model.requests[1]?.messages.some((m) => m.content.includes("total minutes: 60")));
-  assert.deepEqual(f.traces.list(outcome.traceId).filter((e) => e.name === "goal.verify")
+  assert.deepEqual(f.traces.list(outcome.traceId).filter((e) => e.name === "goal.verify" && e.status !== "started")
     .map((e) => e.status), ["error", "ok"]);
 });
 
 test("repeated invalid answers stop at the step budget", async () => {
   const f = fixture(Array.from({ length: 2 }, () => ({ type: "answer", content: plan(60) })),
-    { maxSteps: 2, verifyAnswer: (answer) => verifyStudyPlan(answer, goal, resources) });
+    { maxSteps: 2 }, acceptPlan);
   assert.equal((await f.kernel.run(request())).status, "failed");
   assert.equal(f.model.requests.length, 2);
 });
 
 test("verification exceptions fail the run rather than accepting an unchecked answer", async () => {
   const f = fixture([{ type: "answer", content: "candidate" }],
-    { verifyAnswer: () => { throw new Error("validator unavailable"); } });
+    {}, (hooks) => hooks.addGuard("BeforeFinish", {
+      id: "broken-check", handle: () => { throw new Error("validator unavailable"); },
+    }));
   const outcome = await f.kernel.run(request());
   assert.equal(outcome.status, "failed");
   if (outcome.status === "failed") assert.match(outcome.error, /validator unavailable/);

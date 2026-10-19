@@ -11,7 +11,7 @@
 | 本次任务验收通过 | 目标约束与交付物检查通过 |
 | 长期学习目标达到 | 多次独立评测与延迟保持证据 |
 
-AgentKernel 在未配置 verifyAnswer 时只保证运行闭环完成；配置后还会检查所提供的交付契约。它不会自动证明用户掌握了知识。
+AgentKernel 在未配置 BeforeFinish 验收 Hook 时只保证运行闭环完成；配置后还会检查所提供的交付契约。它不会自动证明用户掌握了知识。
 
 ## 反馈闭环
 
@@ -27,7 +27,7 @@ AgentKernel 在未配置 verifyAnswer 时只保证运行闭环完成；配置后
 
 ## 当前实验
 
-[verifyStudyPlan](../../examples/learning-agent-runtime/src/study-workflow.ts) 检查覆盖、分钟数和资源归属。Kernel 记录 goal.verify，把失败原因交回模型，最多运行 maxSteps 次。校验器抛异常会使 Run 失败，不能放行未检查答案。
+[verifyStudyPlan](../../examples/learning-agent-runtime/src/study-workflow.ts) 检查覆盖、分钟数和资源归属。它注册为 BeforeFinish Hook，由 RuntimeHooks 记录 goal.verify 事件；Kernel 把失败原因交回模型，最多运行 maxSteps 次。校验器抛异常或超时会使 Run 失败，不能放行未检查答案。生命周期机制见 [阶段 8](../08-execution-runtime/hooks.md)。
 
 ~~~sh
 npm run tutorial:patterns

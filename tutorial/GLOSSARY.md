@@ -34,18 +34,16 @@
 | Skill Runner | 加载 Skill 并将其约束、资源和步骤注入 Agent Run 的组件 |
 | RAG | 在生成前检索外部知识并加入上下文的模式，不等于长期记忆 |
 
-## 专家封装
+## 插件与分发
 
 | 术语 | 定义 |
 |---|---|
-| Expert Package | 位于 Agent Runtime 之上的版本化产品定义，组合身份、方法论、Skills、能力需求、状态策略、自动化模板和评测 |
-| Expert Definition | 某个 expertId 与 version 对应的不可变专家定义及其依赖摘要 |
-| Resolved Expert Definition | Expert Package 通过路径、依赖、安全、预算和评测校验后的编译结果 |
-| Expert Installation | 某环境安装 Expert Definition 后形成的依赖锁、组织配置、信任状态和可用性记录 |
-| Expert Binding | 某个用户或 Thread 对一个已安装专家的选择、同意、连接和自动化配置 |
-| Expert Run Context | 一次 Run 固定使用的 Expert 版本、依赖 Lock、用户状态引用和有效权限视图 |
-| Automation Template | Expert Package 声明的时间或事件触发意图；绑定并编译后才能成为 Trigger |
-| Trust Envelope | 关于 Package 来源、签名、Digest、审核、权限摘要、评测和撤销状态的信任记录 |
+| Agent Plugin | 组织可复用组件的包；本教程采用 Agent Plugins 1.0.0 的目录与加载契约 |
+| Plugin Manifest | 插件根目录的 plugin.json，包含规范声明、名称及可选元数据 |
+| Plugin Client | 按所支持规范发现并加载插件组件的宿主 |
+| Client Extension | 通过反向域名命名空间声明的宿主专属数据或文件，不保证跨客户端生效 |
+| Marketplace | 发现、获取和分发能力包的渠道，其产品规则不等于插件格式标准 |
+| PLUGIN_ROOT / PLUGIN_DATA | 宿主向 stdio 插件进程提供的包根目录与持久数据目录，不能代替用户隔离 |
 
 ## 状态与记忆
 
@@ -63,6 +61,7 @@
 | 术语 | 定义 |
 |---|---|
 | Runtime | 在模型之外维护状态、执行动作、调度任务和实施策略的软件系统 |
+| Hook | 宿主在生命周期节点触发的扩展处理器，可按契约观察事件、拦截动作或验收结果 |
 | Scheduler | 根据时间或计划唤醒 Job 的控制面组件 |
 | Event Bus | 发布、订阅和传递业务事件的组件 |
 | Job | Scheduler 或 Event Trigger 创建的一次后台执行请求 |
@@ -84,17 +83,12 @@ Agent Run         Thread 上发生的一次执行
 ~~~
 
 ~~~
-Skill 说明怎样做
+Skill 提供任务方法与上下文工作流程
 Tool 提供原子动作
 Tool Calling 让模型提出动作
 MCP 标准化能力连接方式
+Hooks 在生命周期节点观察或干预运行
+Plugin 封装可复用组件，交给宿主加载
 Connector 处理具体系统、账号和权限
 Runtime 真正执行并保存状态
-~~~
-
-~~~
-Expert Package       可发布定义
-Expert Installation  环境级安装与依赖解析
-Expert Binding       用户级选择、连接和同意
-Expert Run Context   单次执行固定版本与有效权限
 ~~~

@@ -5,7 +5,7 @@
 
 ## Scheduler 不属于 Tool Calling
 
-Tool Calling 发生在一次 Agent Run 内。Scheduler 决定何时创建或恢复 Run。
+Tool Calling 发生在一次 Agent Run 内。Scheduler 决定何时创建或恢复 Run。Webhook 接收外部业务事件；[生命周期 Hook](../08-execution-runtime/hooks.md) 在 Runtime 内部节点触发。收到 Webhook 可以创建 Run，随后才由 Run 触发自己的 Hooks。
 
 ~~~
 时间 / Webhook / 业务事件

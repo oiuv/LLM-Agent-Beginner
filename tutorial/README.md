@@ -14,7 +14,7 @@
 | [5 · Tools、MCP 与 Connectors](05-tools-mcp-connectors/README.md) | 怎样连接外部能力 | MCP Server、Client 与权限边界 |
 | [6 · Skills](06-skills/README.md) | 怎样复用任务方法 | 按需发现、加载与评测 |
 | [7 · Memory 与 Thread](07-memory-thread/README.md) | 怎样记住事实并续接任务 | 状态、记忆与检索边界 |
-| [8 · 执行运行时](08-execution-runtime/README.md) | 怎样处理动作的风险与失败 | 审批、恢复、预算与交付物 |
+| [8 · 执行运行时与 Hooks](08-execution-runtime/README.md) | 怎样管理生命周期、动作风险与失败 | Hooks、审批、恢复、预算与交付物 |
 | [9 · 调度与持久任务](09-scheduling/README.md) | 谁决定何时执行 | 事件去重、优先级与恢复 |
 | [10 · 多模态输入](10-multimodal/README.md) | 怎样统一不同输入 | 带来源的 Observation |
 | [11 · 多智能体](11-multi-agent/README.md) | 何时值得委派 | 权限隔离、汇总与成本比较 |
@@ -22,7 +22,7 @@
 | [13 · 安全与评测](13-safety-evaluation/README.md) | 怎样证明任务有效完成 | 分层评测、Trace 与回归集 |
 | [14 · 生产化](14-production/README.md) | 怎样部署和持续改进 | 运行边界、故障演练与版本发布 |
 | [15 · 毕业项目](15-capstone/README.md) | 怎样整合能力 | 可验收的学习 Agent |
-| [16 · 专家包与生态](16-expert-packaging/README.md) | 怎样封装专家定义 | 包、用户绑定与运行状态的设计 |
+| [16 · Agent Plugins](16-agent-plugins/README.md) | 怎样封装并分发能力 | 标准插件、组件加载与市场边界 |
 
 ## 学习节奏
 
@@ -34,7 +34,7 @@
 | 学习产品 | 10～12 | 按需接入多模态与委派，以证据更新学习状态 |
 | 可运营系统 | 13～15 | 任务评测、故障演练、成本和数据生命周期 |
 
-先运行 `npm run tutorial`，再用 `npm run tutorial:patterns` 观察约束失败、有限修正、预算耗尽和优先级。实验说明见 [从单次提示到工作流](01-llm-foundations/from-prompt-to-workflow.md)。复杂度应由失败案例推动；简单需求可以停留在固定工作流。
+先运行 `npm run tutorial`，再用 `npm run tutorial:patterns` 观察约束失败、有限修正、预算耗尽和优先级。实验说明见 [从单次提示到工作流](01-llm-foundations/from-prompt-to-workflow.md)。阶段 8 运行 `npm run tutorial:hooks`，观察工具拦截、观察器故障与完成验收，见 [Hooks 专题](08-execution-runtime/hooks.md)。复杂度应由失败案例推动；简单需求可以停留在固定工作流。
 
 ## 系列边界
 
