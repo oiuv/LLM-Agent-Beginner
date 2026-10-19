@@ -9,14 +9,16 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test:runtime",
-    "test:all": "npm run test --workspaces --if-present",
+    "test:all": "npm run test:runtime && npm run check:docs",
     "tutorial": "npm --workspace @tutorial/learning-agent-runtime run demo",
     "test:runtime": "npm --workspace @tutorial/learning-agent-runtime test",
     "demo": "npm run tutorial",
-    "demo:legacy": "cd PART6-Demo-Project && npm run start",
-    "weather-server": "cd PART2-MCP-Server/weather-server && npm run start",
-    "github-server": "cd PART2-MCP-Server/github-server && npm run start",
-    "client-example": "cd PART3-MCP-Client/client-example && npm run start"
+    "weather-server": "npm --prefix examples/weather-mcp run start",
+    "github-server": "npm --prefix examples/github-mcp run start",
+    "client-example": "npm --prefix examples/mcp-client run demo",
+    "demo:mcp": "npm --prefix examples/mcp-assistant run start",
+    "tutorial:patterns": "npm --workspace @tutorial/learning-agent-runtime run patterns",
+    "check:docs": "node scripts/check-docs.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

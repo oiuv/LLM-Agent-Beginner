@@ -6,6 +6,7 @@ export interface Trigger {
   type: "once" | "event";
   expression: string;
   taskName: string;
+  priority: number;
   enabled: boolean;
 }
 
@@ -13,6 +14,7 @@ export interface Job {
   id: string;
   threadId: string;
   taskName: string;
+  priority: number;
   status: "queued" | "running" | "completed" | "failed" | "cancelled";
   attempt: number;
   availableAt: string;
@@ -30,13 +32,16 @@ export class InMemoryScheduler {
     threadId: string,
     taskName: string,
     at: Date,
+    priority = 0,
   ): Trigger {
+    if (!Number.isFinite(priority)) throw new Error("priority must be finite");
     const trigger: Trigger = {
       id: randomUUID(),
       threadId,
       type: "once",
       expression: at.toISOString(),
       taskName,
+      priority,
       enabled: true,
     };
     this.triggers.set(trigger.id, trigger);
@@ -47,13 +52,16 @@ export class InMemoryScheduler {
     threadId: string,
     taskName: string,
     eventType: string,
+    priority = 0,
   ): Trigger {
+    if (!Number.isFinite(priority)) throw new Error("priority must be finite");
     const trigger: Trigger = {
       id: randomUUID(),
       threadId,
       type: "event",
       expression: eventType,
       taskName,
+      priority,
       enabled: true,
     };
     this.triggers.set(trigger.id, trigger);
@@ -76,6 +84,7 @@ export class InMemoryScheduler {
         trigger.taskName,
         now,
         key,
+        trigger.priority,
       );
       trigger.enabled = false;
       if (job) created.push(job);
@@ -96,6 +105,7 @@ export class InMemoryScheduler {
           trigger.taskName,
           now,
           "event:" + eventId + ":" + trigger.id,
+          trigger.priority,
         );
         if (job) created.push(job);
       }
@@ -113,7 +123,10 @@ export class InMemoryScheduler {
             job.leaseUntil !== undefined &&
             new Date(job.leaseUntil).getTime() <= now.getTime()),
       )
-      .sort((left, right) => left.availableAt.localeCompare(right.availableAt));
+      .sort((left, right) =>
+        right.priority - left.priority ||
+        left.availableAt.localeCompare(right.availableAt),
+      );
 
     const job = candidates[0];
     if (!job) return undefined;
@@ -145,6 +158,7 @@ export class InMemoryScheduler {
     taskName: string,
     availableAt: Date,
     idempotencyKey: string,
+    priority: number,
   ): Job | undefined {
     if (this.idempotencyKeys.has(idempotencyKey)) return undefined;
     this.idempotencyKeys.add(idempotencyKey);
@@ -152,6 +166,7 @@ export class InMemoryScheduler {
       id: randomUUID(),
       threadId,
       taskName,
+      priority,
       status: "queued",
       attempt: 0,
       availableAt: availableAt.toISOString(),

@@ -96,6 +96,14 @@ Queue 提供：
 
 Worker 获取 Job 后先申请租约。进程崩溃后租约过期，其他 Worker 才能恢复。
 
+## 优先级只决定就绪任务的领取顺序
+
+先检查依赖与 availableAt，再排序。优先级可以来自截止时间、学习收益或用户交互，但规则应由产品明确；模型可以提供建议，不能突破资源与权限限制。
+
+[InMemoryScheduler](../../examples/learning-agent-runtime/src/scheduler.ts) 为 Trigger 和 Job 保存 priority。数值越大越优先，同优先级按 availableAt；有效租约内的任务不被抢占。事件任务继承触发器优先级，去重行为不变。
+
+运行 `npm run tutorial:patterns`，同时到期的考前复习应先于周总结领取。该示例没有动态提权、防饥饿、持久队列或租约续期。练习中可增加等待时间提权，并验证低优先级任务最终也能执行。
+
 ## Checkpoint
 
 Checkpoint 保存：
@@ -153,3 +161,6 @@ Job 完成后产生领域事件，通知服务根据用户偏好选择站内、�
 - 用户可取消未来 Trigger 和运行中 Job；
 - 时区转换有测试。
 
+## 示例验证范围
+
+当前调度器使用 Map。测试模拟同一进程中的重复事件与过期租约，不能证明机器重启后恢复。持久化 Trigger/Job、Checkpoint、取消、时区与幂等副作用需要按本章验收另行实现。

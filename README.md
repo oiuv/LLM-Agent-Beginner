@@ -1,237 +1,42 @@
-# 从零开发完整 Agent
+# LLM Agent 开发入门
 
-## MCP 2026-07-28 主线
+从一次模型调用出发，围绕“指导学习 Agent”逐步理解工具、规划、状态、执行和调度为什么需要独立设计，并用 TypeScript 验证关键行为。
 
-MCP 教程的现有 [PART1 协议](PART1-MCP-Protocol/01-protocol-overview.md)、[PART2 Server](PART2-MCP-Server/01-server-architecture.md)、[PART3 Client](PART3-MCP-Client/01-client-architecture.md) 已以已发布的 2026-07-28 版为主线；[2025 握手版与迁移](PART1-MCP-Protocol/10-mcp-2026-07-28-upgrade-guide.md)作为附录。
+## 系列分工
 
-> 从模型调用开始，循序渐进构建具备理解、规划、记忆、执行、调度、多模态和治理能力的指导学习 Agent。
+| 教程 | 重点 |
+|---|---|
+| [LLM Transformer Beginner](https://github.com/oiuv/LLM-Transformer-Beginner) | 模型原理、训练、微调与对齐 |
+| [LLM Embedding Beginner](https://github.com/oiuv/LLM-Embedding-Beginner) | Embedding、检索、重排与 RAG 质量 |
+| **本教程** | Agent 的决策循环、工具执行、状态管理与工程治理 |
 
-## 新版推荐入口
+需要检索知识时，本教程讲“何时检索、如何使用证据、何时停止”，检索系统的实现交给 Embedding 教程。
 
-本项目已从“以 MCP 和 Skills 为主线”重构为“以完整 Agent 生命周期为主线”。
+## 开始学习
 
-- [进入新版课程](tutorial/README.md)
-- [查看统一术语](tutorial/GLOSSARY.md)
-- [运行示例 Agent Runtime](examples/learning-agent-runtime/README.md)
-- [阅读 Expert Package 设计专题](tutorial/16-expert-packaging/README.md)
-- [查看旧教程迁移映射](tutorial/LEGACY-MAP.md)
+1. 阅读 [课程路线](tutorial/README.md)，按阶段 0～15 学习；阶段 16 是进阶设计专题。
+2. 运行统一的 [学习 Agent 示例](examples/learning-agent-runtime/README.md)。
+3. 对照每章的失败案例、练习和验收标准补齐系统。
 
-新版必修主线为阶段 0～15，使用不依赖 API Key 的统一示例，离线验证 Agent Loop、Tool、Policy、Trace、Memory、Skill、Scheduler 和学习者状态。阶段 16 是毕业后的专家包设计专题；另有基于 OpenAI Agents SDK 的选修实验，需要单独的本地示例和模型服务。
+在项目根目录运行（Node.js 18+）：
 
-快速开始：
-
-~~~bash
+~~~sh
 npm install
+npm test
 npm run tutorial
-npm run test:runtime
+npm run tutorial:patterns
+npm run check:docs
 ~~~
 
-## 专题资料
-
-以下 PART1～PART3 是 MCP 2026-07-28 的深入教程；PART4～PART7 提供 Skills、Agent 模式和部署专题。零基础学习建议先按阶段 0～15 前进。
-
----
-
-## 专题目录
-
-```
-PART1: MCP 协议层（理论基础）
-├── 00-ecosystem-evolution.md   ⭐ AI技术演进：LLM→Agent→MCP→Skills
-├── 01-protocol-overview.md     协议设计哲学、三层架构、四种能力
-├── 02-json-rpc-spec.md        JSON-RPC 2.0 完整规范
-├── 03-message-types.md        MCP 消息类型详解
-├── 04-capabilities.md          每请求能力声明
-├── 05-transport-layer.md       stdio 和 Streamable HTTP 传输层
-├── 06-error-handling.md       错误码体系与调试
-├── 07-mcp-vs-rag.md           MCP 与 RAG 的选择指南
-└── 08-architecture-blueprint.md ⭐ 完整系统架构六层模型
-
-PART2: MCP Server 开发
-├── 01-server-architecture.md   Server 架构与组件协作
-├── 02-tool-definition.md      工具定义与 inputSchema
-├── 03-resource-management.md  资源管理与订阅机制
-├── 04-prompt-management.md    提示词模板
-└── 05-session-lifecycle.md    无协议会话的请求生命周期
-
-PART3: MCP Client 开发
-├── 01-client-architecture.md  Client 架构
-├── 02-connection-management.md  连接管理与重连
-└── 03-tool-discovery.md     工具发现与调用
-
-PART4: Skills 系统
-├── 00-quickstart.md              5 分钟快速入门
-├── 01-skills-specification.md    SKILL.md 格式规范
-├── 02-skill-parser.md           Skill 解析器实现
-├── 03-skill-creation-guide.md   Skill 创建最佳实践
-├── 04-skill-evaluation.md       Skill 评估与优化
-├── 05-advanced-skill-examples.md 复杂 Skill 案例
-├── 06-description-optimization.md 触发描述优化
-├── 07-skill-testing.md          Skill 测试与迭代
-├── 08-skills-vs-mcp.md          Skills、MCP 与 RAG 的选择指南
-└── 09-tool-vs-skill-discovery.md ⭐ Tool 与 Skill 发现机制对比
-
-PART5: Agent 实现
-├── 01-function-calling-mechanism.md ⭐ Function Calling 机制详解（地基）
-├── 02-agent-architecture.md      Agent 架构设计
-├── 03-react-pattern.md          ReAct 推理模式
-├── 04-tool-orchestration.md      工具编排模式
-├── 05-memory-system.md          三层记忆系统
-├── 06-multi-agent.md           Multi-Agent 协作
-├── 07-planning-mechanism.md      Planning 规划机制
-├── 08-reflection-mechanism.md    Reflection 反思机制
-├── 09-agent-frameworks.md       Agent 框架生态
-├── 10-guardrails-safety.md      Guardrails 与 Agent 安全
-├── 11-prompt-engineering.md     Prompt Engineering for Agents
-└── 12-evaluation-testing.md     Agent 评估与测试
-
-PART6: 完整项目
-└── 01-project-overview.md   Weather + GitHub 助手完整实现
-
-PART7: 生产环境
-└── 01-deployment-guide.md  容器化、监控、安全、CI/CD
-```
-
----
-
-## 学习目标
-
-完成本教程后，你将掌握：
-
-### 认知层面
-- 理解 LLM → Agent → MCP → Skills 的技术演进逻辑
-- 建立完整的六层系统架构认知
-- 理解 Function Calling 的桥接机制
-
-### 协议层面
-- 理解 MCP 协议的设计原理和通信机制
-- 掌握 JSON-RPC 2.0 规范
-- 理解 每请求能力声明
-
-### 开发层面
-- 开发自己的 MCP Server（工具、资源、提示词）
-- 开发自己的 MCP Client（连接管理、请求分发）
-- 设计和实现 Skills（SKILL.md 规范、解析器）
-- 实现 Agent 系统（ReAct、工具编排、记忆系统）
-
-### 设计层面
-- 区分 Tool 与 Skill 的适用场景
-- 设计合理的工具接口
-- 编写高质量的 Skill 文档
-
-### 实战层面
-- 完整项目实战
-- 生产环境部署
-
----
-
-## 内容特色
-
-| 特色 | 说明 |
-|------|------|
-| **原理优先** | 每个概念都讲"为什么"，不只是"是什么" |
-| **完整代码** | 每个知识点都有可运行的完整代码 |
-| **循序渐进** | 从协议层到应用层，认知顺序排列 |
-| **实践导向** | 理论 + 代码 + 示例，可直接应用到项目 |
-
----
-
-## 专题学习顺序
-
-```
-第一阶段：建立认知地图（必读）
-PART1-MCP-Protocol/
-├── 00-ecosystem-evolution.md     ⭐ AI技术演进全景（LLM→Agent→MCP→Skills）
-├── 01-protocol-overview.md       协议设计哲学
-├── ...
-└── 08-architecture-blueprint.md  ⭐ 完整系统架构六层模型
-
-第二阶段：理解核心机制
-PART5-Agent/
-├── 01-function-calling-mechanism.md ⭐ Function Calling（先搞懂"LLM怎么调工具"）
-├── 02-agent-architecture.md      Agent架构
-├── 03-react-pattern.md          ReAct模式
-├── 04-tool-orchestration.md     工具编排
-├── 05-memory-system.md          记忆系统
-├── 06-multi-agent.md           Multi-Agent协作
-├── 07-planning-mechanism.md      Planning规划机制
-├── 08-reflection-mechanism.md    Reflection反思机制
-├── 09-agent-frameworks.md       Agent框架生态
-├── 10-guardrails-safety.md      Guardrails与安全
-├── 11-prompt-engineering.md     Prompt Engineering专题
-└── 12-evaluation-testing.md     Agent评估与测试
-
-第三阶段：动手实践
-PART2-MCP-Server/
-└── 开发 MCP Server
-
-PART3-MCP-Client/
-└── 开发 MCP Client
-
-第四阶段：掌握 Skills
-PART4-Skills-System/
-├── 00-quickstart.md              5分钟快速入门
-├── 01-skills-specification.md    SKILL.md规范
-├── 02-skill-parser.md           Skill解析器
-├── 03-skill-creation-guide.md   创建最佳实践
-├── 04-skill-evaluation.md       评估与优化
-├── 05-advanced-skill-examples.md 复杂案例
-├── 06-description-optimization.md 触发描述优化
-├── 07-skill-testing.md          测试与迭代
-├── 08-skills-vs-mcp.md          选择指南
-└── 09-tool-vs-skill-discovery.md ⭐ Tool与Skill发现机制对比
-
-第五阶段：项目实战
-PART6-Demo-Project/
-└── 综合运用所有知识
-
-第六阶段：生产部署
-PART7-Production/
-└── 容器化、监控、安全、CI/CD
-```
-
----
+示例默认使用 ScriptedModel，不需要 API Key。它验证控制流、校验、预算和调度行为；真实模型质量与教学效果需要独立评测。
 
 ## 项目结构
 
-```
-LLM-Skills_beginner/
-├── PART1-MCP-Protocol/       协议层理论
-├── PART2-MCP-Server/         Server 开发
-├── PART3-MCP-Client/         Client 开发
-├── PART4-Skills-System/       Skills 系统
-├── PART5-Agent/               Agent 实现
-├── PART6-Demo-Project/        完整项目
-└── PART7-Production/          生产部署
-```
+- [tutorial/](tutorial/README.md)：唯一课程入口；深入阅读归入对应阶段。
+- [examples/](examples/README.md)：学习 Agent 与 MCP 实验。
+- [术语表](tutorial/GLOSSARY.md)：统一核心概念。
+- [章节模板](tutorial/CHAPTER-TEMPLATE.md)：贡献章节的写作与验收要求。
 
----
+示例当前使用内存存储。持久化审批、跨进程恢复、多模态适配器和专家包安装器属于课程练习或设计目标，具体范围见 [示例说明](examples/learning-agent-runtime/README.md)。
 
-## 技术栈
-
-- **语言**：TypeScript / Node.js
-- **协议**：JSON-RPC 2.0（MCP 协议版本 `2026-07-28`）
-- **传输**：stdio、Streamable HTTP
-- **SDK**：
-  - Server: `@modelcontextprotocol/server`
-  - Client: `@modelcontextprotocol/client`
-
----
-
-## 配套项目
-
-教程包含一个完整的演示项目：
-
-```
-demo-project/
-├── servers/
-│   ├── weather-server/        天气 MCP Server
-│   └── github-server/         GitHub MCP Server
-└── src/
-    ├── agent/                 Agent 实现
-    ├── mcp/                   MCP Client
-    └── cli.ts                 CLI 入口
-```
-
----
-
-_Last updated: 2026-08-04_
+设计模式阅读参考 [Agentic Design Patterns 中文版](https://ningg.top/Agentic-Design-Patterns-CN/)。本教程按问题出现的顺序引入模式，每增加一个组件都说明收益、成本与停止条件。

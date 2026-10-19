@@ -141,6 +141,8 @@ Thread 变长后：
 
 ## 延伸阅读
 
-- [现有记忆系统](../../PART5-Agent/05-memory-system.md)
-- [上下文构建](../../PART5-Agent/02-agent-architecture.md)
+- [上下文构建](../03-agent-kernel/README.md)
 
+## Agentic Retrieval 的边界
+
+[检索决策与证据使用](agentic-retrieval.md) 解释何时检索、何时换来源、何时因证据不足而停止。Embedding、切分、向量库和重排统一在 [Embedding 教程](https://github.com/oiuv/LLM-Embedding-Beginner) 学习，避免在这里重建另一套 RAG 教程。

@@ -51,7 +51,7 @@ test("Agent completes a real model-tool-model loop", async () => {
   );
 });
 
-test("write tools wait for persisted approval", async () => {
+test("write tools pause before execution when approval is missing", async () => {
   const registry = new ToolRegistry();
   registry.register(createWriteTool());
   const traces = new InMemoryTraceStore();

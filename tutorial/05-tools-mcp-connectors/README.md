@@ -1,9 +1,13 @@
 # 阶段 5：Tools、MCP 与 Connectors
 
-> MCP 主线采用已发布的 2026-07-28 规范。依次阅读 [协议](../../PART1-MCP-Protocol/01-protocol-overview.md) → [Server](../../PART2-MCP-Server/01-server-architecture.md) → [Client](../../PART3-MCP-Client/01-client-architecture.md)。[2025 握手版与迁移](../../PART1-MCP-Protocol/10-mcp-2026-07-28-upgrade-guide.md)仅作附录。规范以 [官方 2026-07-28 文档](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/cc2a84f5ca5404b2949683f7d7876f623344294f/docs/specification/2026-07-28)和 [schema.ts](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/cc2a84f5ca5404b2949683f7d7876f623344294f/schema/2026-07-28/schema.ts) 为准。
+> MCP 主线采用已发布的 2026-07-28 规范。依次阅读 [协议](mcp/protocol/01-protocol-overview.md) → [Server](mcp/server/01-server-architecture.md) → [Client](mcp/client/01-client-architecture.md)。规范以 [官方 2026-07-28 文档](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/cc2a84f5ca5404b2949683f7d7876f623344294f/docs/specification/2026-07-28)和 [schema.ts](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/cc2a84f5ca5404b2949683f7d7876f623344294f/schema/2026-07-28/schema.ts) 为准。
 
 > 前置知识：阶段 2～4  
 > 里程碑：Agent 能通过统一注册表使用本地 Tool、MCP Tool 和外部 Connector
+
+## 本章实验
+
+[MCP 示例目录](../../examples/README.md) 包含 stdio、HTTP、Server 和 Client。将 MCP 接入 Agent 的统一 ToolRegistry，以及 OAuth Connector，仍需按本章练习实现；协议示例本身不会自动完成这项集成。
 
 ## 三者的职责
 
@@ -74,7 +78,7 @@ interface CapabilitySource {
 - Resource：按 URI 读取上下文数据。
 - Prompt：Server 提供的可复用提示模板。
 
-不要把只读文档查询设计成有副作用的 Tool，也不要把 Agent 的全部系统策略交给远端 Prompt。
+只读文档可按 URI 暴露为 Resource，也可按业务需求提供查询 Tool；只读能力应正确标注副作用等级。远端 Prompt 不能接管 Host 的系统策略。
 
 ## Connector 额外解决的问题
 
@@ -147,6 +151,6 @@ secretRef 指向密钥保管系统，不能把访问令牌放入 Prompt、Memory
 
 ## 延伸阅读
 
-- [MCP 协议概览](../../PART1-MCP-Protocol/01-protocol-overview.md)
-- [MCP Server 架构](../../PART2-MCP-Server/01-server-architecture.md)
-- [MCP Client 架构](../../PART3-MCP-Client/01-client-architecture.md)
+- [MCP 协议概览](mcp/protocol/01-protocol-overview.md)
+- [MCP Server 架构](mcp/server/01-server-architecture.md)
+- [MCP Client 架构](mcp/client/01-client-architecture.md)

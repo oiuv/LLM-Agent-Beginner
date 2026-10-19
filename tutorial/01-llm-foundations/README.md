@@ -17,40 +17,13 @@ Agent 的决策质量受模型影响，但工程可靠性不能交给模型。�
 - 供应商适配器；
 - 确定性测试替身。
 
-模型训练、微调和 Transformer 数学不属于本课程主线。
+模型训练、微调和 Transformer 数学见系列中的 [Transformer 教程](https://github.com/oiuv/LLM-Transformer-Beginner)。
 
 ## 统一 ModelProvider
 
-~~~ts
-interface ModelMessage {
-  role: "system" | "user" | "assistant" | "tool";
-  content: string;
-  name?: string;
-  toolCallId?: string;
-}
+直接阅读 [ModelProvider、ModelRequest 与 ModelDecision](../../examples/learning-agent-runtime/src/types.ts)。输入是消息、允许使用的工具与取消信号；输出是 answer、tool_calls 或 request_input。
 
-interface ToolDescriptor {
-  name: string;
-  description: string;
-  inputSchema: Record<string, unknown>;
-}
-
-type ModelDecision =
-  | { type: "answer"; content: string }
-  | { type: "tool_calls"; calls: ProposedToolCall[] }
-  | { type: "request_input"; question: string };
-
-interface ModelProvider {
-  decide(input: {
-    messages: ModelMessage[];
-    tools: ToolDescriptor[];
-    responseSchema?: Record<string, unknown>;
-    signal?: AbortSignal;
-  }): Promise<ModelDecision>;
-}
-~~~
-
-Agent Kernel 只依赖 ModelProvider。真实模型、离线 ScriptedModel、回放模型和测试 Fake 都实现这个接口。
+Agent Kernel 只依赖该接口。真实 SDK 由适配器转换消息和工具调用；结构化输出配置需在适配器中实现，目前教学接口没有 responseSchema 参数。
 
 ## 消息不是完整状态
 
@@ -128,21 +101,9 @@ interface Diagnosis {
 
 ## 确定性测试
 
-不要让基础单元测试依赖远程模型。ScriptedModel 按顺序返回预设决策：
+[ScriptedModel](../../examples/learning-agent-runtime/src/model.ts) 按顺序返回预设决策，并保存收到的请求，便于检查工具结果与验收反馈是否传回模型。
 
-~~~ts
-class ScriptedModel implements ModelProvider {
-  constructor(private decisions: ModelDecision[]) {}
-
-  async decide(): Promise<ModelDecision> {
-    const decision = this.decisions.shift();
-    if (!decision) throw new Error("No scripted decision");
-    return decision;
-  }
-}
-~~~
-
-真实模型用于集成测试和评测集；Kernel、Tool Registry 和状态机使用确定性测试。
+Kernel、工具与状态机使用确定性测试；真实模型能力另用集成测试和固定任务集评测。预设的正确答案不能证明模型能力得到提升。
 
 ## 常见错误
 
@@ -163,3 +124,6 @@ class ScriptedModel implements ModelProvider {
 - 取消信号能够传播；
 - 单元测试不需要网络和 API Key。
 
+## 架构递进实验
+
+阅读 [从一次提示到可验证工作流](from-prompt-to-workflow.md)：同一份学习计划依次引出结构化链、路由、独立读取、验收反馈与动态规划。先看清每一步解决什么失败，再进入工具调用。

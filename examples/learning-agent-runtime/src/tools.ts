@@ -47,10 +47,13 @@ export class BasicPolicyEngine implements PolicyEngine {
     if (this.deniedTools.has(tool.name)) {
       return { effect: "deny", reason: "Tool is denied by policy" };
     }
-    if (this.approvalForWrites && tool.sideEffect === "write") {
+    if (
+      this.approvalForWrites &&
+      (tool.sideEffect === "write" || tool.sideEffect === "external")
+    ) {
       return {
         effect: "require_approval",
-        summary: "允许工具 " + tool.name + " 写入数据",
+        summary: "允许工具 " + tool.name + " 执行写入或外部动作",
       };
     }
     return { effect: "allow" };

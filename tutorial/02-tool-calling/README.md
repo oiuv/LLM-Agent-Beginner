@@ -17,31 +17,9 @@ Model：根据结果回答或继续调用
 
 ## Tool 的最小接口
 
-~~~ts
-interface ToolContext {
-  userId: string;
-  threadId: string;
-  runId: string;
-  signal: AbortSignal;
-}
+直接阅读 [Tool、ToolContext 与 ToolResult](../../examples/learning-agent-runtime/src/types.ts)。Tool 包含名称、版本、描述、输入 Schema、副作用类别、validate 与 execute。ToolContext 传递用户、Thread、traceId 和取消信号。
 
-interface ToolResult {
-  ok: boolean;
-  content: unknown;
-  error?: { code: string; message: string; retryable: boolean };
-  artifactIds?: string[];
-}
-
-interface Tool {
-  name: string;
-  description: string;
-  inputSchema: Record<string, unknown>;
-  sideEffect: "none" | "read" | "write" | "external";
-  execute(args: unknown, context: ToolContext): Promise<ToolResult>;
-}
-~~~
-
-描述必须面向模型说明用途、适用条件和边界。名字应稳定、动词开头，不把多个无关动作塞进一个 Tool。
+描述向模型说明用途与适用边界；validate 是运行时校验，不能被 TypeScript 类型替代。工具名称尽量稳定，不把无关动作塞进同一个 Tool。
 
 ## Tool Registry
 
@@ -53,28 +31,7 @@ interface Tool {
 - 每用户或每任务可见性过滤；
 - 策略元数据和版本管理。
 
-~~~ts
-class ToolRegistry {
-  private tools = new Map<string, Tool>();
-
-  register(tool: Tool): void {
-    if (this.tools.has(tool.name)) throw new Error("Duplicate tool");
-    this.tools.set(tool.name, tool);
-  }
-
-  describe(allowed: Set<string>): ToolDescriptor[] {
-    return [...this.tools.values()]
-      .filter(tool => allowed.has(tool.name))
-      .map(({ name, description, inputSchema }) => ({
-        name, description, inputSchema
-      }));
-  }
-
-  get(name: string): Tool | undefined {
-    return this.tools.get(name);
-  }
-}
-~~~
+实现见 [ToolRegistry](../../examples/learning-agent-runtime/src/tools.ts)。
 
 ## 执行前检查
 
@@ -92,6 +49,8 @@ class ToolRegistry {
 不要把“模型选择了工具”误认为“系统授权执行”。
 
 ## 工具循环
+
+以下是教学伪代码；可运行实现与停止路径见 [AgentKernel](../../examples/learning-agent-runtime/src/agent.ts)。
 
 ~~~ts
 for (let step = 0; step < maxSteps; step += 1) {
@@ -166,6 +125,6 @@ throw new Error("Agent exceeded max steps");
 
 ## 延伸阅读
 
-- [Function Calling 机制](../../PART5-Agent/01-function-calling-mechanism.md)
-- [Tool 定义](../../PART2-MCP-Server/02-tool-definition.md)
+- [Function Calling 机制](function-calling.md)
+- [Tool 定义](../05-tools-mcp-connectors/mcp/server/02-tool-definition.md)
 

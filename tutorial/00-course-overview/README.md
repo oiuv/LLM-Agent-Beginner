@@ -19,7 +19,7 @@
 | Chatbot | 模型生成回复 | 对话历史 | 通常没有 | 问答、改写、总结 |
 | Workflow | 代码预先定义步骤 | 流程状态 | 固定动作 | 稳定、重复业务 |
 | Tool Assistant | 模型选择少量工具 | 会话状态 | 有 | 搜索、查询、计算 |
-| Agent | 围绕目标动态规划和执行 | 持久 Thread/Task | 有且受治理 | 开放式多步任务 |
+| Agent | 围绕目标动态规划和执行 | 运行状态，可按需持久化 | 有且受治理 | 开放式多步任务 |
 
 是否使用 Agent，应看任务是否同时具备开放目标、动态决策、多步反馈和外部行动。固定表单审批不需要 Agent；“分析薄弱知识点、生成计划、每日跟踪并调整”适合 Agent。
 
@@ -48,42 +48,17 @@ Repeat：继续、重规划或结束
 
 ## 核心对象模型
 
-~~~ts
-type ID = string;
+| 对象 | 职责 |
+|---|---|
+| Thread | 同一用户目标的连续上下文与状态引用 |
+| Run | 一次被用户、时间或事件触发的执行 |
+| Turn | 一轮观察与决策 |
+| Task | 可独立跟踪、调度和验收的工作 |
+| Observation | 带来源、类型与时间的输入或执行结果 |
 
-interface Thread {
-  id: ID;
-  userId: ID;
-  goal?: string;
-  activeRunId?: ID;
-  memoryRefs: ID[];
-  artifactRefs: ID[];
-  version: number;
-}
+实际接口见 [types.ts](../../examples/learning-agent-runtime/src/types.ts) 与 [stores.ts](../../examples/learning-agent-runtime/src/stores.ts)。Task、持久 Checkpoint 和完整 Run Store 属于后续练习；不要为教程另外维护一份不同的核心类型。
 
-interface Run {
-  id: ID;
-  threadId: ID;
-  trigger: "user" | "schedule" | "event" | "agent";
-  status: "queued" | "running" | "waiting" | "completed" | "failed";
-  turns: Turn[];
-}
-
-interface Turn {
-  index: number;
-  observation: Observation;
-  action?: AgentAction;
-}
-
-interface Observation {
-  kind: "text" | "audio" | "image" | "screen" | "tool_result" | "event";
-  content: unknown;
-  source: string;
-  occurredAt: string;
-}
-~~~
-
-为什么要先定义对象？因为跨设备恢复、后台调度、重试和审计都依赖稳定标识。如果只保存 messages 数组，后续无法回答“哪个任务失败了”“哪个工具产生了这个文件”。
+重要对象需要稳定 ID，才能回答“哪个任务失败了”“哪个调用生成了文件”。最小 Agent 可只保存当前运行状态，跨会话或后台任务再引入持久化。
 
 ## Agent 一次运行的生命周期
 
@@ -129,8 +104,6 @@ interface Observation {
 - 能列出至少三个非模型组件；
 - 能判断三个具体需求是否需要 Agent。
 
-## 延伸阅读
+## 下一步
 
-- [现有 Agent 架构章节](../../PART5-Agent/02-agent-architecture.md)
-- [现有架构蓝图](../../PART1-MCP-Protocol/08-architecture-blueprint.md)
-
+进入 [LLM 应用基础](../01-llm-foundations/README.md)，用同一学习计划任务观察架构怎样随失败案例逐步演进。

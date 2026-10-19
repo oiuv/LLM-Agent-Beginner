@@ -18,21 +18,9 @@ Tool Loop 只解决“模型调用工具”。Agent Kernel 还要负责：
 
 ## Kernel 输入与输出
 
-~~~ts
-interface RunRequest {
-  threadId: string;
-  trigger: "user" | "schedule" | "event" | "agent";
-  observation: Observation;
-}
+使用 [AgentRunRequest 与 RunOutcome](../../examples/learning-agent-runtime/src/types.ts)。输入包括用户、Thread、Observation、允许工具和可选取消信号；输出为 completed、waiting、cancelled 或 failed，并携带 traceId。
 
-type RunOutcome =
-  | { status: "completed"; answer: string; artifactIds: string[] }
-  | { status: "waiting"; reason: "user_input" | "approval"; prompt: string }
-  | { status: "cancelled" }
-  | { status: "failed"; error: string };
-~~~
-
-Kernel 不直接处理 HTTP、数据库驱动或 UI。它通过 Store 和服务接口读取状态。
+[当前 Kernel](../../examples/learning-agent-runtime/src/agent.ts) 实现单次循环、验收与预算；上下文持久化、计划与恢复接口是后续阶段的扩展。它不直接处理 HTTP、数据库驱动或 UI。
 
 ## Agent 状态机
 
@@ -47,7 +35,7 @@ running ──→ waiting_user ──→ running
    └──→ cancelled
 ~~~
 
-每次迁移必须记录事件。waiting 不是失败，cancelled 也不应被错误地自动重试。
+这张图是完整状态机设计；当前示例返回 waiting，但没有持久恢复入口。每次状态迁移必须记录事件。waiting 不是失败，cancelled 也不应被错误地自动重试。
 
 ## Context Builder
 
@@ -66,18 +54,7 @@ running ──→ waiting_user ──→ running
 
 ## Action 类型
 
-~~~ts
-type AgentAction =
-  | { type: "answer"; content: string }
-  | { type: "tool_calls"; calls: ProposedToolCall[] }
-  | { type: "update_plan"; plan: Plan }
-  | { type: "request_input"; question: string }
-  | { type: "request_approval"; operation: string }
-  | { type: "delegate"; role: string; task: string }
-  | { type: "finish"; summary: string };
-~~~
-
-模型只提出 Action。Runtime 根据状态和策略接受、拒绝或转换 Action。
+当前 ModelDecision 只有 answer、tool_calls 和 request_input。审批由 Policy Engine 产生，模型不能自行批准动作。阶段 4 和阶段 11 再设计计划更新与委派，不要把尚未实现的 Action 当作现成能力。
 
 ## ReAct 循环
 
@@ -157,12 +134,10 @@ Trace 是调试、评测和审计共同的事实来源。
 - Kernel 不依赖具体模型或数据库实现；
 - 状态迁移合法且可追踪；
 - 所有结束路径产生 RunOutcome；
-- 取消和预算能中止正在执行的工具；
+- 调用次数预算在执行前生效，取消信号能传到支持取消的工具；
 - 测试不访问网络。
 
 ## 延伸阅读
 
-- [Agent 架构](../../PART5-Agent/02-agent-architecture.md)
-- [ReAct 模式](../../PART5-Agent/03-react-pattern.md)
-- [工具编排](../../PART5-Agent/04-tool-orchestration.md)
+- [工具编排](../04-planning-workflow/orchestration.md)
 

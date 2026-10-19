@@ -141,5 +141,5 @@ interface DerivedContent {
 
 ## 延伸阅读
 
-- [MCP Tool 内容类型](../../PART2-MCP-Server/02-tool-definition.md)
+- [MCP Tool 内容类型](../05-tools-mcp-connectors/mcp/server/02-tool-definition.md)
 

@@ -7,7 +7,7 @@
 
 Tool 告诉 Agent“能做什么”，Skill 告诉 Agent“某类任务怎样做得稳定”。例如 generate_quiz 是 Tool；“根据知识状态生成一次诊断测验”是 Skill。
 
-一个 Skill 应包含：
+设计一套可维护的 Skill 时，文件、测试与宿主配置共同提供：
 
 - 名称、描述和触发条件；
 - 适用与不适用场景；
@@ -20,25 +20,9 @@ Tool 告诉 Agent“能做什么”，Skill 告诉 Agent“某类任务怎样做
 
 ## Skill 数据模型
 
-~~~ts
-interface SkillManifest {
-  name: string;
-  version: string;
-  description: string;
-  triggers: string[];
-  requiredTools: string[];
-  risk: "low" | "medium" | "high";
-  entry: string;
-}
+[文件规范](specification.md) 定义 SKILL.md；[SkillManifest 与 LoadedSkill](../../examples/learning-agent-runtime/src/skills.ts) 是本项目内部接口，二者需要适配。version、triggers、requiredTools、risk 不是通用标准的必填顶层字段。
 
-interface LoadedSkill {
-  manifest: SkillManifest;
-  instructions: string;
-  resources: Array<{ name: string; uri: string }>;
-}
-~~~
-
-Skill 文档是资源，Skill Runner 才是运行能力。只解析 Markdown 但不接入 Agent Context、Tool Policy 和 Trace，还不算完整 Skills 系统。
+当前 SkillRegistry 支持索引、依赖检查与惰性加载，没有文件解析器或 SkillRunner。下文的 Runner 是实现练习。
 
 ## Progressive Disclosure
 
@@ -91,7 +75,7 @@ Skill 不应自行绕开 Kernel 执行危险工具。所有动作仍经过 Tool 
 
 高风险步骤应使用固定 Workflow；开放分析可由 Skill 指导模型完成。二者可以组合。
 
-## 示例：错题诊断 Skill
+## 示例：错题诊断的内部配置
 
 ~~~
 name: diagnose-mistakes
@@ -155,8 +139,11 @@ requiredTools:
 
 ## 延伸阅读
 
-- [Skill 规范](../../PART4-Skills-System/01-skills-specification.md)
-- [Skill 创建指南](../../PART4-Skills-System/03-skill-creation-guide.md)
-- [Skill 评估](../../PART4-Skills-System/04-skill-evaluation.md)
-- [Tool 与 Skill 发现](../../PART4-Skills-System/09-tool-vs-skill-discovery.md)
+- [Skill 规范](specification.md)
+- [Skill 创建指南](authoring.md)
+- [Skill 评估](evaluation.md)
+- [Tool 与 Skill 发现](discovery.md)
 
+- [快速实验](quickstart.md)
+- [加载与文件适配](loading.md)
+- [领域设计练习](examples.md)

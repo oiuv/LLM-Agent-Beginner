@@ -39,21 +39,9 @@
 
 ## Trace Schema
 
-~~~ts
-interface TraceEvent {
-  id: string;
-  traceId: string;
-  parentId?: string;
-  type: "run" | "model" | "tool" | "policy" | "memory" | "task" | "artifact";
-  name: string;
-  startedAt: string;
-  endedAt?: string;
-  status: "ok" | "error" | "cancelled";
-  attributes: Record<string, string | number | boolean>;
-}
-~~~
+实际结构见 [TraceEvent](../../examples/learning-agent-runtime/src/types.ts) 与 [TraceStore](../../examples/learning-agent-runtime/src/trace.ts)。示例用独立 started/ok/error/cancelled 事件表示生命周期；生产系统可增加耗时、模型用量与持久索引。
 
-敏感内容应脱敏或只保存引用。Trace 需要 retention 和访问权限。
+记录可观察的输入引用、动作、策略结果与验收反馈，不要求暴露模型私有思维过程。敏感内容脱敏或只保存引用，并配置保留期限与访问权限。
 
 ## 评测分层
 
@@ -106,6 +94,12 @@ interface EvalCase {
 - Policy Violation Rate；
 - 学习效果指标。
 
+## 设计模式需要比较收益
+
+用同一任务集比较单次提示、结构化链、路由、并行与有限反思。每次只改一个主要变量，同时记录任务成功率、失败类别、模型与工具调用数、延迟和费用。
+
+[架构实验](../../examples/learning-agent-runtime/src/patterns.test.ts) 验证确定性控制流，不能作为真实模型效果证据。任务交付验收、模型质量与学生长期学习效果分别报告。
+
 ## 回归与发布门槛
 
 每次修改 Prompt、Skill、Tool Schema、模型、Memory 或 Planner 都可能改变行为。发布前：
@@ -137,10 +131,3 @@ interface EvalCase {
 - 版本对比包含质量、延迟和成本；
 - 安全失败能阻止发布；
 - 学习效果与文本质量分别评估。
-
-## 延伸阅读
-
-- [Guardrails](../../PART5-Agent/10-guardrails-safety.md)
-- [Prompt 工程](../../PART5-Agent/11-prompt-engineering.md)
-- [Agent 评测](../../PART5-Agent/12-evaluation-testing.md)
-

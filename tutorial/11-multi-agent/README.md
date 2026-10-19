@@ -128,7 +128,3 @@ interface Delegation {
 - 取消会传播；
 - 与单 Agent 基线有成本和质量对比。
 
-## 延伸阅读
-
-- [现有多智能体章节](../../PART5-Agent/06-multi-agent.md)
-
