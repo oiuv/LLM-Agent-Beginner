@@ -29,6 +29,7 @@
 | [02 加载与运行边界](02-loading-runtime.md) | 怎样发现组件、隔离故障并接入已有 Runtime |
 | [03 分发与评测](03-distribution-evaluation.md) | 怎样处理市场、版本、信任和验收 |
 | [学习导师插件](../../examples/learning-coach-plugin/README.md) | 检查一个实际标准目录与两项 Skill |
+| [选读：WorkBuddy 产品案例](../case-studies/workbuddy.md) | 通用机制如何组合成产品，哪些配置需要平台适配 |
 
 建议先阅读样例的 plugin.json，再分别打开 SKILL.md 和 mcp.json，最后运行根目录检查：
 
